@@ -7,7 +7,7 @@ const createItem = (req, res) => {
 }
 
 const getItem = (req, res) => {
-    res.send('get single item');
+    res.json('get single item');
 }
 
 const updateItem = (req, res) => {
