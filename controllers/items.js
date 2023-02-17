@@ -1,9 +1,12 @@
+const Item = require('../models/Item');
+
 const getAllItems = (req, res) => {
     res.send('get all items');
 }
 
-const createItem = (req, res) => {
-    res.send(req.body);
+const createItem = async (req, res) => {
+    const item = await Item.create(req.body);
+    res.status(201).json({ item });
 }
 
 const getItem = (req, res) => {
