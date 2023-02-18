@@ -6,11 +6,11 @@ require('dotenv').config();
 
 // middleware
 app.use(express.json());
-
+app.use(express.static('./public'));
 // routes
-app.get('/', (req, res) => {
-    res.send('item manager app');
-});
+// app.get('/', (req, res) => {
+//     res.send('item manager app');
+// });
 
 app.use('/api/v1/items', items);
 
