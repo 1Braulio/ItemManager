@@ -1,16 +1,35 @@
 const Item = require('../models/Item');
 
-const getAllItems = (req, res) => {
-    res.send('get all items');
+const getAllItems = async (req, res) => {
+    try {
+        const items = await Item.find({});
+        res.status(200).send({ items });
+    } catch (error) {
+        res.status(500).send({ msg: error });
+    }
 }
 
 const createItem = async (req, res) => {
-    const item = await Item.create(req.body);
-    res.status(201).json({ item });
+    try {
+        const item = await Item.create(req.body);
+        res.status(201).json({ item });
+    } catch (error) {
+        res.status(500).json({ msg: error });
+    }
 }
 
-const getItem = (req, res) => {
-    res.json('get single item');
+const getItem = async (req, res) => {
+    try {
+        const {id: itemId} = req.params;
+        const item = await Item.findOne({_id: itemId});
+        if (!item) {
+            return res.status(404).json({msg: `No item with id ${itemId}`});
+        }
+        res.status(200).json({item});
+    } catch (error) {
+        res.status(500).json({msg: error});
+    }
+    
 }
 
 const updateItem = (req, res) => {
