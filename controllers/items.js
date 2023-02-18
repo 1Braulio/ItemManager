@@ -32,14 +32,36 @@ const getItem = async (req, res) => {
     
 }
 
-const updateItem = (req, res) => {
-    res.send('update item');
+const deleteItem = async (req, res) => {
+    try {
+        const {id: itemId} = req.params;
+        const item = await Item.findOneAndDelete({_id: itemId});
+        if (!item) {
+            return res.status(404).json({msg: `No item with id ${itemId}`});
+        }
+        // res.status(200).json({item});
+        res.status(200).send();
+        res.status(200).json({item: null, status: 'success'});
+    } catch (error) {
+        res.status(500).json({msg: error});
+    }
 }
 
-const deleteItem = (req, res) => {
-    res.send('item deleted');
+const updateItem = async (req, res) => {
+    try {
+        const {id: itemId} = req.params;
+        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!item) {
+            return res.status(404).json({msg: `No item with id ${itemId}`});
+        }
+        res.status(200).json({item});
+    } catch (error) {
+        res.status(500).json({ msg: error });
+    }
 }
-
 
 module.exports = {
     getAllItems,
