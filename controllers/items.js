@@ -1,67 +1,48 @@
 const Item = require('../models/Item');
+const asyncWrapper = require('../middleware/async');
+const {createCustomAPIError} = require('../errors/custom-error');
 
-const getAllItems = async (req, res) => {
-    try {
-        const items = await Item.find({});
-        res.status(200).send({ items });
-    } catch (error) {
-        res.status(500).send({ msg: error });
-    }
-}
+const getAllItems = asyncWrapper( async (req, res) => {
+    const items = await Item.find({});
+    res.status(200).json({ items });
+})
 
-const createItem = async (req, res) => {
-    try {
-        const item = await Item.create(req.body);
-        res.status(201).json({ item });
-    } catch (error) {
-        res.status(500).json({ msg: error });
-    }
-}
+const createItem = asyncWrapper( async (req, res) => {
+    const item = await Item.create(req.body);
+    res.status(201).json({ item });
+})
 
-const getItem = async (req, res) => {
-    try {
-        const {id: itemId} = req.params;
-        const item = await Item.findOne({_id: itemId});
-        if (!item) {
-            return res.status(404).json({msg: `No item with id ${itemId}`});
-        }
-        res.status(200).json({item});
-    } catch (error) {
-        res.status(500).json({msg: error});
+const getItem = asyncWrapper( async (req, res, next) => {
+    const {id: itemId} = req.params;
+    const item = await Item.findOne({_id: itemId});
+    if (!item) {
+        return next(createCustomAPIError(`No item with id ${itemId}`, 404));
     }
-    
-}
+    res.status(200).json({item});
+})
 
-const deleteItem = async (req, res) => {
-    try {
-        const {id: itemId} = req.params;
-        const item = await Item.findOneAndDelete({_id: itemId});
-        if (!item) {
-            return res.status(404).json({msg: `No item with id ${itemId}`});
-        }
-        // res.status(200).json({item});
-        res.status(200).send();
-        res.status(200).json({item: null, status: 'success'});
-    } catch (error) {
-        res.status(500).json({msg: error});
+const deleteItem = asyncWrapper( async (req, res, next) => {
+    const {id: itemId} = req.params;
+    const item = await Item.findOneAndDelete({_id: itemId});
+    if (!item) {
+        return next(createCustomAPIError(`No item with id ${itemId}`, 404));
     }
-}
+    // res.status(200).json({item});
+    // res.status(200).send();
+    res.status(200).json({item: null, status: 'success'});
+})
 
-const updateItem = async (req, res) => {
-    try {
-        const {id: itemId} = req.params;
-        const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {
-            new: true,
-            runValidators: true,
-        });
-        if (!item) {
-            return res.status(404).json({msg: `No item with id ${itemId}`});
-        }
-        res.status(200).json({item});
-    } catch (error) {
-        res.status(500).json({ msg: error });
+const updateItem = asyncWrapper( async (req, res, next) => {
+    const {id: itemId} = req.params;
+    const item = await Item.findOneAndUpdate({_id: itemId}, req.body, {
+        new: true,
+        runValidators: true,
+    });
+    if (!item) {
+        return next(createCustomAPIError(`No item with id ${itemId}`, 404));
     }
-}
+    res.status(200).json({item});
+})
 
 module.exports = {
     getAllItems,
